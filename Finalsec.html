@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Shh... A Secret</title>
+<style>
+:root{
+  --bg1: #FFF6FB;
+  --bg2: #FFF0F6;
+  --pink: #FF7BA9;
+  --text:#3a2d2d;
+}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:'Poppins', sans-serif;
+  background: linear-gradient(180deg,var(--bg1),var(--bg2));
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+  box-sizing:border-box;
+}
+.card{
+  width:100%;
+  max-width:420px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,250,250,0.95));
+  border-radius:20px;
+  padding:22px;
+  box-shadow: 0 12px 36px rgba(15,12,20,0.12);
+  position:relative;
+  overflow:hidden;
+}
+.sparkle{
+  pointer-events:none;
+  position:absolute;
+  inset:0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.7) 0px, transparent 6px),
+    radial-gradient(circle at 80% 60%, rgba(255,240,250,0.6) 0px, transparent 8px);
+  mix-blend-mode:screen;
+  opacity:0.95;
+}
+.title{
+  font-size:clamp(22px,6.2vw,32px);
+  color:var(--text);
+  margin:6px 0 0;
+  text-align:center;
+  line-height:1.05;
+  font-weight:700;
+}
+.subtitle{
+  font-size:14px;
+  color:#7a6b7d;
+  text-align:center;
+  margin-top:8px;
+}
+.hero{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:18px auto;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  background: radial-gradient(circle at 30% 20%, #fff, #fff7fb 70%);
+  box-shadow: 0 8px 40px rgba(200,100,160,0.08), inset 0 -6px 18px rgba(255,255,255,0.5);
+  position:relative;
+  overflow:hidden;
+  border: 6px solid rgba(255,255,255,0.6);
+}
+.hero .emoji{ font-size:64px; transform:translateY(4px); }
+.actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin-top:12px;
+  padding-bottom:12px;
+}
+.btn{
+  border:0;
+  padding:12px 18px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  transition: transform .16s cubic-bezier(.2,.9,.3,1), box-shadow .16s;
+}
+.btn:active{ transform:translateY(2px) scale(.995); }
+.btn.yes{ background: linear-gradient(90deg,var(--pink), #FF9FC3); color:#fff; }
+.btn.no{ background:transparent; border:2px solid rgba(120,80,100,0.14); color:var(--text); }
+.modal{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(255,255,255,0.02));
+  z-index:30;
+  backdrop-filter: blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transition: opacity 300ms ease;
+}
+.modal.show{ opacity:1; pointer-events:auto; }
+.modal-card{
+  background: linear-gradient(180deg,#ffffff,#fff8fb);
+  padding:18px;
+  border-radius:16px;
+  width:88%;
+  max-width:360px;
+  text-align:center;
+  box-shadow: 0 20px 48px rgba(18,8,20,0.18);
+}
+.modal-msg{ font-weight:700; color:var(--text); font-size:18px; margin-bottom:8px; }
+.modal-sub{ color:#7d6b7a; font-size:13px; margin-bottom:14px; }
+.plead{ font-size:13px; color:#8b6e7f; font-weight:600; display:block; margin-top:8px; opacity:0; transition:opacity .28s; }
+.plead.show{ opacity:1; }
+.reveal{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background: radial-gradient(circle at 50% 40%, rgba(255,240,245,0.6), rgba(255,245,230,0.25));
+  z-index:80;
+  pointer-events:none;
+  opacity:0;
+  transform:scale(.98);
+  transition: opacity 520ms cubic-bezier(.2,.9,.3,1), transform 520ms;
+}
+.reveal.show{ opacity:1; pointer-events:auto; transform:scale(1); }
+.reveal h2{
+  font-size:clamp(22px,6.4vw,36px); color:var(--pink); margin:8px 0 6px; text-align:center; font-weight:800;
+  text-shadow: 0 6px 18px rgba(250,140,180,0.12);
+}
+.reveal p{
+  font-size:20px; color:#6a2640; margin:0 0 8px; text-align:center; font-weight:800;
+}
+.sparkles{ display:flex; gap:6px; margin-top:10px; }
+.spark{ width:12px; height:12px; border-radius:50%; background: radial-gradient(circle at 40% 30%, #fff, #ffd6e8); box-shadow: 0 6px 14px rgba(255,130,170,0.25); transform:scale(.8); animation: twinkle 1.8s infinite; }
+.spark:nth-child(2){ animation-delay:.12s; }
+.spark:nth-child(3){ animation-delay:.28s; }
+@keyframes twinkle{ 0%{ transform:scale(.8) }50%{ transform:scale(1.12) }100%{ transform:scale(.8) } }
+.footer{ margin-top:10px; font-size:12px; color:#a07f93; text-align:center; }
+.shake{ animation: shake 340ms cubic-bezier(.36,.07,.19,.97); }
+@keyframes shake{ 10%,90%{ transform: translateX(-1px); } 20%,80%{ transform: translateX(2px); } 30%,50%,70%{ transform: translateX(-4px); } 40%,60%{ transform: translateX(4px); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+    <div class="sparkle"></div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div class="hero" id="hero">
+        <div class="emoji">💖</div>
+      </div>
+
+      <div style="padding:6px 8px;">
+        <div class="title" id="title">I want to tell a secret…</div>
+        <div class="subtitle" id="subtitle">Want to listen?</div>
+      </div>
+
+      <div class="actions" id="actions">
+        <button class="btn yes" id="yesBtn">Yes 💕</button>
+        <button class="btn no" id="noBtn">No 🙈</button>
+      </div>
+
+      <div class="footer">Made with tiny heartbeats 💓</div>
+    </div>
+
+    <!-- modal -->
+    <div class="modal" id="modal">
+      <div class="modal-card">
+        <div class="modal-msg" id="modalTitle">Are you sure?</div>
+        <div class="modal-sub" id="modalSub">Do you really not want to hear my secret?</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn yes" id="modalYes">Okay, tell me 💗</button>
+          <button class="btn no" id="modalNo">No, I'm sure 🙊</button>
+        </div>
+        <span class="plead" id="plead">Pretty please? 🥺</span>
+      </div>
+    </div>
+
+    <!-- reveal secret -->
+    <div class="reveal" id="reveal">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <h2 id="revealTitle">Shh... the secret is</h2>
+        <p id="revealText">You know… there’s a girl named <b>Sahiba (Rasmalai)</b>,<br>and she is the most beautiful girl I have ever seen ✨</p>
+        <div class="sparkles">
+          <div class="spark"></div>
+          <div class="spark"></div>
+          <div class="spark"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const modal = document.getElementById('modal');
+const modalYes = document.getElementById('modalYes');
+const modalNo = document.getElementById('modalNo');
+const plead = document.getElementById('plead');
+const reveal = document.getElementById('reveal');
+const card = document.getElementById('card');
+const hero = document.getElementById('hero');
+const title = document.getElementById('title');
+const subtitle = document.getElementById('subtitle');
+
+let noClicks = 0;
+
+function spawnHeart(xPct){
+  const h = document.createElement('div');
+  h.style.position='absolute';
+  h.style.left = (xPct ? xPct+'%' : (20 + Math.random()*60)+'%');
+  h.style.bottom = '20px';
+  h.style.width = '18px';
+  h.style.height = '18px';
+  h.style.pointerEvents='none';
+  h.style.transform = 'translateY(0) scale(1)';
+  h.style.opacity = 0.95;
+  h.style.zIndex = 60;
+  h.style.borderRadius = '8px';
+  h.style.background = 'radial-gradient(circle at 30% 30%, #fff 0px, rgba(255,255,255,0) 6px), linear-gradient(135deg,#ff93be,#ffd1e6)';
+  h.style.boxShadow = '0 6px 16px rgba(255,120,170,0.12)';
+  card.appendChild(h);
+  const dur = 4200 + Math.random()*2600;
+  const start = performance.now();
+  function anim(t){
+    const p = Math.min(1, (t-start)/dur);
+    h.style.transform = `translateY(-${p*260}px) scale(${1 + p*0.4})`;
+    h.style.opacity = `${1 - p*1.1}`;
+    if(p < 1) requestAnimationFrame(anim); else h.remove();
+  }
+  requestAnimationFrame(anim);
+}
+
+function confettiBurst(){
+  for(let i=0;i<40;i++){
+    spawnHeart(10 + Math.random()*80);
+  }
+}
+
+function showModal(){
+  modal.classList.add('show');
+  plead.classList.remove('show');
+  setTimeout(()=> {
+    if(noClicks > 0) plead.classList.add('show');
+  }, 320);
+}
+
+function hideModal(){
+  modal.classList.remove('show');
+}
+
+function revealSecret(){
+  title.textContent = "Okay... close your eyes ✨";
+  subtitle.textContent = "I'll whisper it — ready?";
+  hero.querySelector('.emoji').textContent = '🤫';
+  setTimeout(()=> {
+    reveal.classList.add('show');
+    confettiBurst();
+    hero.querySelector('.emoji').textContent = '🌟';
+    document.getElementById('revealTitle').textContent = "Shh… the secret is";
+    document.getElementById('revealText').textContent = "You know… there’s a girl named Sahiba (Rasmalai), and she is the most beautiful girl I have ever seen ✨";
+    const hInt = setInterval(()=>spawnHeart(), 360);
+    setTimeout(()=> clearInterval(hInt), 5200);
+    card.style.boxShadow = '0 30px 80px rgba(255,120,180,0.16)';
+  }, 900);
+}
+
+yesBtn.addEventListener('click', ()=>{ hideModal(); revealSecret(); });
+noBtn.addEventListener('click', ()=>{
+  noClicks++;
+  card.classList.add('shake');
+  setTimeout(()=> card.classList.remove('shake'), 360);
+  noBtn.style.transform = `translate(${(Math.random()-0.5)*8}px, ${(Math.random()-0.5)*4}px)`;
+  showModal();
+});
+
+modalYes.addEventListener('click', ()=>{ hideModal(); revealSecret(); });
+modalNo.addEventListener('click', ()=>{
+  noClicks++;
+  const mcard = modal.querySelector('.modal-card');
+  mcard.classList.add('shake');
+  setTimeout(()=> mcard.classList.remove('shake'), 340);
+  showModal();
+});
+
+modal.addEventListener('click', (e)=>{
+  if(e.target === modal){
+    modal.querySelector('.modal-card').classList.add('shake');
+    setTimeout(()=> modal.querySelector('.modal-card').classList.remove('shake'), 320);
+  }
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') revealSecret();
+  if(e.key === 'Escape'){ hideModal(); }
+});
+
+setTimeout(()=> {
+  for(let i=0;i<6;i++) setTimeout(()=> spawnHeart(20 + Math.random()*60), i*420);
+}, 600);
+
+document.body.addEventListener('touchmove', function(e){ if(e.target.closest('.card')) e.preventDefault(); }, {passive:false});
+</script>
+</body>
+</html>
